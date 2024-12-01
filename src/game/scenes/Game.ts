@@ -1,36 +1,46 @@
-import { EventBus } from '../EventBus';
-import { Scene } from 'phaser';
+import Phaser from "phaser";
 
-export class Game extends Scene
-{
-    camera: Phaser.Cameras.Scene2D.Camera;
-    background: Phaser.GameObjects.Image;
-    gameText: Phaser.GameObjects.Text;
+interface GameState {
+    player: Phaser.GameObjects.Rectangle;
+    cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+}
 
-    constructor ()
-    {
-        super('Game');
+export class Game extends Phaser.Scene implements GameState {
+    cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+    player: Phaser.GameObjects.Rectangle;
+    
+    constructor() {
+        super({ key: 'Game' });
     }
-
-    create ()
-    {
-        this.camera = this.cameras.main;
-        this.camera.setBackgroundColor(0x00ff00);
-
-        this.background = this.add.image(512, 384, 'background');
-        this.background.setAlpha(0.5);
-
-        this.gameText = this.add.text(512, 384, 'Make something fun!\nand share it with us:\nsupport@phaser.io', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
-            align: 'center'
-        }).setOrigin(0.5).setDepth(100);
-
-        EventBus.emit('current-scene-ready', this);
+    
+    preload() {
     }
-
-    changeScene ()
-    {
-        this.scene.start('GameOver');
+    create() {
+        this.player = this.add.rectangle(400, 300, 32, 32, 0xff0000);
+        this.physics.add.existing(this.player);
+        // @ts-ignore
+        this.cursors = this.input.keyboard.createCursorKeys();
+        this.cameras.main.startFollow(this.player);
+    }
+    update() {
+        const speed: number = 200;
+        
+        const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
+        
+        playerBody.setVelocity(0);
+        
+        if (this.cursors.left.isDown) {
+            playerBody.setVelocityX(-speed);
+        }else if (this.cursors.right.isDown) {
+            playerBody.setVelocityX(speed);
+        }
+        
+        if (this.cursors.up.isDown) {
+            playerBody.setVelocityY(-speed);
+        } else if (this.cursors.down.isDown) {
+            playerBody.setVelocityY(speed);
+        }
+        
+        playerBody.velocity.normalize().scale(speed);
     }
 }

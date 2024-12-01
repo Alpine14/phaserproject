@@ -1,24 +1,18 @@
-import Head from "next/head";
-import { Inter } from "next/font/google";
-import styles from "@/styles/Home.module.css";
-import dynamic from "next/dynamic";
+import React from 'react';
+import dynamic from 'next/dynamic';
 
-const inter = Inter({ subsets: ["latin"] });
+// Import the game component with SSR disabled
+const GameComponent = dynamic(() => import('../components/Game'), {
+    ssr: false
+});
 
-const AppWithoutSSR = dynamic(() => import("@/App"), { ssr: false });
-
-export default function Home() {
+const Home: React.FC = () => {
     return (
-        <>
-            <Head>
-                <title>Phaser Nextjs Template</title>
-                <meta name="description" content="A Phaser 3 Next.js project template that demonstrates Next.js with React communication and uses Vite for bundling." />
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <link rel="icon" href="/favicon.png" />
-            </Head>
-            <main className={`${styles.main} ${inter.className}`}>
-                <AppWithoutSSR />
-            </main>
-        </>
+        <div className="w-full h-screen flex items-center justify-center bg-gray-900">
+            <div id="game-container"/>
+            <GameComponent/>
+        </div>
     );
-}
+};
+
+export default Home;
